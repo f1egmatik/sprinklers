@@ -5,7 +5,8 @@ esphome:
 
 # Enable logging
 logger:
-
+  level: VERY_VERBOSE
+  
 # Enable Home Assistant API
 api:
 
@@ -15,6 +16,7 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_pass
+  reboot_timeout: 24h
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -71,6 +73,31 @@ output:
       number: GPIO33
       mode: OUTPUT
       #inverted: true
+
+binary_sensor:
+  - platform: gpio
+    pin: GPIO36
+    name: "Button"
+    on_click:
+    - min_length: 50ms
+      max_length: 350ms
+      then:
+        - script.execute: sprinkler_5
+        - script.wait: sprinkler_5
+        - script.execute: sprinkler_3
+        - script.wait: sprinkler_3
+        - script.execute: sprinkler_1
+        - script.wait: sprinkler_1
+        - script.execute: sprinkler_2
+        - script.wait: sprinkler_2
+        - script.execute: sprinklers_off
+    - min_length: 500ms
+      max_length: 1000ms
+      then:
+        - script.execute: sprinkler_4
+        - script.wait: sprinkler_4
+        - script.execute: sprinklers_off
+#        - switch.turn_on: relay_1
 
 script:
   - id: sprinklers_off
@@ -143,8 +170,8 @@ time:
     id: homeassistant_time
     on_time:
       - seconds: 0
-        minutes: 40
-        hours: 14
+        minutes: 5
+        hours: 22
         then:
           - script.execute: sprinkler_5
           - script.wait: sprinkler_5
