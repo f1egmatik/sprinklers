@@ -1,0 +1,164 @@
+esphome:
+  name: sprinklers
+  platform: ESP32
+  board: esp32dev
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "87c2ef4fb33a7005eb9e1e85169f8de6"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pass
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Sprinklers Fallback Hotspot"
+    password: "f7T3bxJQWdO3"
+
+captive_portal:
+
+output:
+  # Выход Реле Q0
+  - platform: gpio
+    id: zona1
+    pin:
+      number: GPIO14
+      mode: OUTPUT
+      #inverted: true
+
+  # Выход Реле Q1
+  - platform: gpio
+    id: zona2
+    pin:
+      number: GPIO12
+      mode: OUTPUT
+      #inverted: true
+
+  # Выход Реле Q2
+  - platform: gpio
+    id: zona3
+    pin:
+      number: GPIO13
+      mode: OUTPUT
+      #inverted: true
+
+  # Выход Реле Q3
+  - platform: gpio
+    id: zona4
+    pin:
+      number: GPIO15
+      mode: OUTPUT
+      #inverted: true
+
+  # Выход Реле Q4
+  - platform: gpio
+    id: zona5
+    pin:
+      number: GPIO2
+      mode: OUTPUT
+      #inverted: true
+
+  # Выход Реле Q5
+  - platform: gpio
+    id: zona6
+    pin:
+      number: GPIO33
+      mode: OUTPUT
+      #inverted: true
+
+script:
+  - id: sprinklers_off
+    then:
+      - output.turn_off: zona1
+      - output.turn_off: zona2
+      - output.turn_off: zona3
+      - output.turn_off: zona4
+      - output.turn_off: zona5
+      - output.turn_off: zona6
+
+  - id: sprinkler_1
+    then:
+      - output.turn_off: zona2
+      - output.turn_off: zona3
+      - output.turn_off: zona4
+      - output.turn_off: zona5
+      - output.turn_off: zona6
+      - output.turn_on: zona1
+      - delay: 10min
+      - output.turn_off: zona1
+
+  - id: sprinkler_2
+    then:
+      - output.turn_off: zona1
+      - output.turn_off: zona3
+      - output.turn_off: zona4
+      - output.turn_off: zona5
+      - output.turn_off: zona6
+      - output.turn_on: zona2
+      - delay: 
+          minutes: 60
+      - output.turn_off: zona2
+
+  - id: sprinkler_3
+    then:
+      - output.turn_off: zona1
+      - output.turn_off: zona2
+      - output.turn_off: zona4
+      - output.turn_off: zona5
+      - output.turn_off: zona6
+      - output.turn_on: zona3
+      - delay: 10min
+      - output.turn_off: zona3
+
+  - id: sprinkler_4
+    then:
+      - output.turn_off: zona1
+      - output.turn_off: zona2
+      - output.turn_off: zona3
+      - output.turn_off: zona5
+      - output.turn_off: zona6
+      - output.turn_on: zona4
+      - delay: 60 min
+      - output.turn_off: zona4
+
+  - id: sprinkler_5
+    then:
+      - output.turn_off: zona1
+      - output.turn_off: zona2
+      - output.turn_off: zona3
+      - output.turn_off: zona4
+      - output.turn_off: zona6
+      - output.turn_on: zona5
+      - delay: 10min
+      - output.turn_off: zona5
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    on_time:
+      - seconds: 0
+        minutes: 40
+        hours: 14
+        then:
+          - script.execute: sprinkler_5
+          - script.wait: sprinkler_5
+          - script.execute: sprinkler_3
+          - script.wait: sprinkler_3
+          - script.execute: sprinkler_1
+          - script.wait: sprinkler_1
+          - script.execute: sprinkler_2
+          - script.wait: sprinkler_2
+          - script.execute: sprinklers_off
+      - seconds: 0
+        minutes: 29
+        hours: 5
+        then:
+          - script.execute: sprinkler_4
+          - script.wait: sprinkler_4
+          - script.execute: sprinklers_off
