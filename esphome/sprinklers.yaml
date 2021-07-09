@@ -5,7 +5,7 @@ esphome:
 
 # Enable logging
 logger:
-  level: VERY_VERBOSE
+#  level: VERY_VERBOSE
   
 # Enable Home Assistant API
 api:
@@ -25,54 +25,115 @@ wifi:
 
 captive_portal:
 
-output:
-  # Выход Реле Q0
-  - platform: gpio
-    id: zona1
-    pin:
-      number: GPIO14
-      mode: OUTPUT
-      #inverted: true
+i2c:
+  sda: GPIO17
+  scl: GPIO16
 
-  # Выход Реле Q1
-  - platform: gpio
-    id: zona2
-    pin:
-      number: GPIO12
-      mode: OUTPUT
-      #inverted: true
+font:
+  - file: "fonts/LiberationMono-Regular.ttf"
+    id: my_font
+    size: 20
 
-  # Выход Реле Q2
-  - platform: gpio
-    id: zona3
-    pin:
-      number: GPIO13
-      mode: OUTPUT
-      #inverted: true
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
+    lambda: |-
+      it.print(0, 0, id(my_font), "Hello World!");
 
-  # Выход Реле Q3
+switch:
   - platform: gpio
-    id: zona4
-    pin:
-      number: GPIO15
-      mode: OUTPUT
-      #inverted: true
+    pin: GPIO14
+    id: sprinklers_1
+    name: "IrriZone 1"
+    icon: mdi:sprinkler-variant
+    on_turn_on:
+      - switch.turn_off: sprinklers_2
+      - switch.turn_off: sprinklers_3
+      - switch.turn_off: sprinklers_4
+      - switch.turn_off: sprinklers_5
+      - switch.turn_off: sprinklers_6
+#      - output.turn_on: zone1
+      - delay: 
+          minutes: 60
+      - switch.turn_off: sprinklers_1
+#    on_turn_off:
+#      - output.turn_off: zone1
 
-  # Выход Реле Q4
   - platform: gpio
-    id: zona5
-    pin:
-      number: GPIO2
-      mode: OUTPUT
-      #inverted: true
+    pin: GPIO12
+    id: sprinklers_2
+    name: "IrriZone 2"
+    icon: mdi:sprinkler-variant
+    on_turn_on:
+      - switch.turn_off: sprinklers_1
+      - switch.turn_off: sprinklers_3
+      - switch.turn_off: sprinklers_4
+      - switch.turn_off: sprinklers_5
+      - switch.turn_off: sprinklers_6
+      - delay: 
+          minutes: 60
+      - switch.turn_off: sprinklers_2
 
-  # Выход Реле Q5
   - platform: gpio
-    id: zona6
-    pin:
-      number: GPIO33
-      mode: OUTPUT
-      #inverted: true
+    pin: GPIO13
+    id: sprinklers_3
+    name: "IrriZone 3"
+    icon: mdi:sprinkler-variant
+    on_turn_on:
+      - switch.turn_off: sprinklers_1
+      - switch.turn_off: sprinklers_2
+      - switch.turn_off: sprinklers_4
+      - switch.turn_off: sprinklers_5
+      - switch.turn_off: sprinklers_6
+      - delay: 
+          minutes: 60
+      - switch.turn_off: sprinklers_3
+
+  - platform: gpio
+    pin: GPIO15
+    id: sprinklers_4
+    name: "IrriZone 4"
+    icon: mdi:sprinkler-variant
+    on_turn_on:
+      - switch.turn_off: sprinklers_1
+      - switch.turn_off: sprinklers_2
+      - switch.turn_off: sprinklers_3
+      - switch.turn_off: sprinklers_5
+      - switch.turn_off: sprinklers_6
+      - delay: 
+          minutes: 60
+      - switch.turn_off: sprinklers_4
+
+  - platform: gpio
+    pin: GPIO2
+    id: sprinklers_5
+    name: "IrriZone 5"
+    icon: mdi:sprinkler-variant
+    on_turn_on:
+      - switch.turn_off: sprinklers_1
+      - switch.turn_off: sprinklers_2
+      - switch.turn_off: sprinklers_3
+      - switch.turn_off: sprinklers_4
+      - switch.turn_off: sprinklers_6
+      - delay: 
+          minutes: 60
+      - switch.turn_off: sprinklers_5
+
+  - platform: gpio
+    pin: GPIO33 # Q5 @ norvi iiot
+    id: sprinklers_6
+    name: "IrriZone 6"
+    icon: mdi:sprinkler-variant
+    on_turn_on:
+      - switch.turn_off: sprinklers_1
+      - switch.turn_off: sprinklers_2
+      - switch.turn_off: sprinklers_3
+      - switch.turn_off: sprinklers_4
+      - switch.turn_off: sprinklers_5
+      - delay: 
+          minutes: 60
+      - switch.turn_off: sprinklers_6
 
 binary_sensor:
   - platform: gpio
@@ -82,125 +143,66 @@ binary_sensor:
     - min_length: 50ms
       max_length: 350ms
       then:
-        - script.execute: sprinkler_5
-        - script.wait: sprinkler_5
-        - script.execute: sprinkler_3
-        - script.wait: sprinkler_3
-        - script.execute: sprinkler_1
-        - script.wait: sprinkler_1
-        - script.execute: sprinkler_2
-        - script.wait: sprinkler_2
+#        - script.execute: sprinklers_5
+#        - script.wait: sprinklers_5
+#        - script.execute: sprinklers_3
+#        - script.wait: sprinklers_3
+#        - script.execute: sprinklers_1
+#        - script.wait: sprinklers_1
+#        - script.execute: sprinklers_2
+#        - script.wait: sprinklers_2
         - script.execute: sprinklers_off
     - min_length: 500ms
       max_length: 1000ms
       then:
-        - script.execute: sprinkler_4
-        - script.wait: sprinkler_4
+#        - script.execute: sprinklers_4
+#        - script.wait: sprinklers_4
         - script.execute: sprinklers_off
 #        - switch.turn_on: relay_1
 
 script:
   - id: sprinklers_off
     then:
-      - output.turn_off: zona1
-      - output.turn_off: zona2
-      - output.turn_off: zona3
-      - output.turn_off: zona4
-      - output.turn_off: zona5
-      - output.turn_off: zona6
-
-  - id: sprinkler_1
-    then:
-      - output.turn_off: zona2
-      - output.turn_off: zona3
-      - output.turn_off: zona4
-      - output.turn_off: zona5
-      - output.turn_off: zona6
-      - output.turn_on: zona1
-      - delay: 60min
-      - output.turn_off: zona1
-
-  - id: sprinkler_2
-    then:
-      - output.turn_off: zona1
-      - output.turn_off: zona3
-      - output.turn_off: zona4
-      - output.turn_off: zona5
-      - output.turn_off: zona6
-      - output.turn_on: zona2
-      - delay: 
-          minutes: 60
-      - output.turn_off: zona2
-
-  - id: sprinkler_3
-    then:
-      - output.turn_off: zona1
-      - output.turn_off: zona2
-      - output.turn_off: zona4
-      - output.turn_off: zona5
-      - output.turn_off: zona6
-      - output.turn_on: zona3
-      - delay: 60min
-      - output.turn_off: zona3
-
-  - id: sprinkler_4
-    then:
-      - output.turn_off: zona1
-      - output.turn_off: zona2
-      - output.turn_off: zona3
-      - output.turn_off: zona5
-      - output.turn_off: zona6
-      - output.turn_on: zona4
-      - delay: 60 min
-      - output.turn_off: zona4
-
-  - id: sprinkler_5
-    then:
-      - output.turn_off: zona1
-      - output.turn_off: zona2
-      - output.turn_off: zona3
-      - output.turn_off: zona4
-      - output.turn_off: zona6
-      - output.turn_on: zona5
-      - delay: 60min
-      - output.turn_off: zona5
+      - switch.turn_off: sprinklers_1
+      - switch.turn_off: sprinklers_2
+      - switch.turn_off: sprinklers_3
+      - switch.turn_off: sprinklers_4
+      - switch.turn_off: sprinklers_5
+      - switch.turn_off: sprinklers_6
 
 time:
   - platform: homeassistant
     id: homeassistant_time
     on_time:
       - seconds: 0
-        minutes: 54
+        minutes: 0
+        hours: /6
+        then:
+          - script.execute: sprinklers_off
+      - seconds: 0
+        minutes: 55
         hours: 22
         then:
-          - script.execute: sprinkler_5
-#          - delay: 63 min
+          - switch.turn_on: sprinklers_3
       - seconds: 0
-        minutes: 57
-        hours: 23
+        minutes: 1
+        hours: 0
         then:
-          - script.execute: sprinkler_3
-          #- delay: 63 min
-#          - script.wait: sprinkler_3
+          - switch.turn_on: sprinklers_4
       - seconds: 0
-        minutes: 0
+        minutes: 3
         hours: 1
         then:
-          - script.execute: sprinkler_1
+          - switch.turn_on: sprinklers_5
           #- delay: 63 min
 #          - script.wait: sprinkler_1
       - seconds: 0
-        minutes: 3
+        minutes: 5
         hours: 2
         then:
-          - script.execute: sprinkler_2
-          #- delay: 63 min
-#          - script.wait: sprinkler_2
-          - script.execute: sprinklers_off
+          - switch.turn_on: sprinklers_1
       - seconds: 0
         minutes: 29
         hours: 5
         then:
-          - script.execute: sprinkler_4
-          - script.wait: sprinkler_4
-          - script.execute: sprinklers_off
+          - switch.turn_on: sprinklers_2
