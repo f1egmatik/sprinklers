@@ -117,7 +117,7 @@ script:
       - output.turn_off: zona5
       - output.turn_off: zona6
       - output.turn_on: zona1
-      - delay: 10min
+      - delay: 60min
       - output.turn_off: zona1
 
   - id: sprinkler_2
@@ -140,7 +140,7 @@ script:
       - output.turn_off: zona5
       - output.turn_off: zona6
       - output.turn_on: zona3
-      - delay: 10min
+      - delay: 60min
       - output.turn_off: zona3
 
   - id: sprinkler_4
@@ -162,7 +162,7 @@ script:
       - output.turn_off: zona4
       - output.turn_off: zona6
       - output.turn_on: zona5
-      - delay: 10min
+      - delay: 60min
       - output.turn_off: zona5
 
 time:
@@ -170,17 +170,32 @@ time:
     id: homeassistant_time
     on_time:
       - seconds: 0
-        minutes: 5
+        minutes: 54
         hours: 22
         then:
           - script.execute: sprinkler_5
-          - script.wait: sprinkler_5
+#          - delay: 63 min
+      - seconds: 0
+        minutes: 57
+        hours: 23
+        then:
           - script.execute: sprinkler_3
-          - script.wait: sprinkler_3
+          #- delay: 63 min
+#          - script.wait: sprinkler_3
+      - seconds: 0
+        minutes: 0
+        hours: 1
+        then:
           - script.execute: sprinkler_1
-          - script.wait: sprinkler_1
+          #- delay: 63 min
+#          - script.wait: sprinkler_1
+      - seconds: 0
+        minutes: 3
+        hours: 2
+        then:
           - script.execute: sprinkler_2
-          - script.wait: sprinkler_2
+          #- delay: 63 min
+#          - script.wait: sprinkler_2
           - script.execute: sprinklers_off
       - seconds: 0
         minutes: 29
